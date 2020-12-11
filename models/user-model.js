@@ -4,8 +4,9 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
      username: String, 
      password: String,
-     FirstName: String, 
-     LastName: String
+     first_name: String, 
+     last_name: String,
+     oauth_id: String
 });
 
 const User = mongoose.model('user', userSchema);
