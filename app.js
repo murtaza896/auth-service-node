@@ -5,6 +5,7 @@ const passport = require('passport');
 const cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
 
+mongoose.connect(`${process.env.MONGODB_URI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 require('dotenv').config();

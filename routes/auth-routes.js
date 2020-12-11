@@ -27,6 +27,7 @@ router.get('/google/callback',
     // Successful authentication, redirect home.
     // console.log(req.user);
     // console.log("I am authorized");
+    console.log(req.query);
     res.redirect('/');
   }
 );
