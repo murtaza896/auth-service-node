@@ -1,27 +1,29 @@
-const express = require('express');
-const app = express();
-const authRouter = require('./routes/auth-routes');
-const passport = require('passport');
-const cookieSession = require('cookie-session');
-var bodyParser = require('body-parser');
+require('dotenv').config();
+require('./config/passport-setup');
+const express           = require('express'),
+app                     = express(),
+authRouter              = require('./routes/auth-routes'),
+userRouter              = require('./routes/user-routes'),
+passport                = require('passport'),
+mongoose                = require('mongoose');
+cookieSession           = require('cookie-session'),
+bodyParser              = require('body-parser');
 
 mongoose.connect(`${process.env.MONGODB_URI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
-
-require('dotenv').config();
-require('./config/passport-setup');
 app.use(passport.initialize());
-
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use('/auth', authRouter);
+app.use('/user', userRouter);
 
 
+//====================================ROUTES=======================================================
 app.get('/', function(req, res){
-    res.send('Hello World');
+    res.send('Successful login').status(200);
 });
 
 app.get('/failed', function(req, res){
-    res.send('failed to login');
+    res.send("Unauthorized User").status(401);
 })
 
 app.listen(process.env.PORT, function(){

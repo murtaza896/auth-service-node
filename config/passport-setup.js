@@ -1,4 +1,6 @@
 const passport = require('passport');
+const bcrypt = require('bcrypt');
+const User = require('../models/user-model');
 var GoogleStrategy = require('passport-google-oauth20');
 var LocalStrategy = require('passport-local');
 var FacebookStrategy = require('passport-facebook');
@@ -11,25 +13,32 @@ passport.use(new GoogleStrategy({
         passReqToCallback: true
     },
     function(req, accessToken, refreshToken, profile, done) {
-        // User.findOrCreate({ googleId: profile.id }, function (err, user) {
-        //   return cb(err, user);
-        // });
-        // console.log(profile);
-        console.log(req.query);
-        done(null, profile);
+        let payload = {
+            'first_name': profile.name.givenName,
+            'last_name': profile.name.familyName,
+            'username': profile.emails[0].value,
+            'oauth_id': profile.id
+        }
+        User.findOrCreate({ oauth_id: profile.id }, payload , function (err, user) {
+          return done(err, user);
+        });
+        //console.log(profile);
+       // console.log(req.query);
+       // done(null, profile);
     }
 ));
 
 passport.use(new LocalStrategy(
         function(username, password, done) {
-            // User.findOne({ username: username }, function (err, user) {
-            //   if (err) { return done(err); }
-            //   if (!user) { return done(null, false); }
-            //   if (!user.verifyPassword(password)) { return done(null, false); }
-            //   return done(null, user);
-            // });
-            console.log(username, password);
-            return done(null, username);
+            User.findOne({ username: username }, function (err, user) {
+              if (err) { return done(err); }
+              if (!user) { return done(null, false); }
+             // if (!user.verifyPassword(password)) { return done(null, false); }
+              if(!bcrypt.compareSync(password, user.password)) { return done(null, false); }
+              return done(null, user);
+            });
+  //          console.log(username, password);
+  //          return done(null, username);
         }
     )
 );
@@ -53,7 +62,7 @@ passport.use(new FacebookStrategy({
         let email = body.email;  // body.email contains your email
         console.log(body); 
     });
-    // console.log(profile);
+    //console.log(profile);
     return cb(null, profile);
   }
 ));
