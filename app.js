@@ -8,6 +8,7 @@ passport                = require('passport'),
 mongoose                = require('mongoose');
 cookieSession           = require('cookie-session'),
 bodyParser              = require('body-parser');
+eurekaHelper            = require('./eureka-helper');
 
 mongoose.connect(`${process.env.MONGODB_URI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -30,3 +31,4 @@ app.listen(process.env.PORT, function(){
     console.log('listening on port: ' + process.env.PORT);
 })
 
+eurekaHelper.registerWithEureka('auth-service', process.env.PORT);
