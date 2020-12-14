@@ -17,10 +17,11 @@ passport.use(new GoogleStrategy({
             'first_name': profile.name.givenName,
             'last_name': profile.name.familyName,
             'username': profile.emails[0].value,
-            'oauth_id': profile.id
+            'oauth_id': profile.id,
+            'type': 'google'
         }
         User.findOrCreate({ oauth_id: profile.id }, payload , function (err, user) {
-          return done(err, user);
+          return done(err, user._id);
         });
         //console.log(profile);
        // console.log(req.query);
@@ -29,16 +30,20 @@ passport.use(new GoogleStrategy({
 ));
 
 passport.use(new LocalStrategy(
-        function(username, password, done) {
+        function(username, password, done) 
+        {
             User.findOne({ username: username }, function (err, user) {
-              if (err) { return done(err); }
-              if (!user) { return done(null, false); }
-             // if (!user.verifyPassword(password)) { return done(null, false); }
-              if(!bcrypt.compareSync(password, user.password)) { return done(null, false); }
-              return done(null, user);
+                if (err) { return done(err); }
+                if (!user) { return done(null, false); }
+                // if (!user.verifyPassword(password)) { return done(null, false); }
+                if(user.password != undefined)
+                    if(!bcrypt.compareSync(password, user.password))
+                        return done(null, false);
+                    else 
+                        return done(null, user._id);
+                else 
+                    return done(null, false);
             });
-  //          console.log(username, password);
-  //          return done(null, username);
         }
     )
 );
@@ -48,22 +53,30 @@ passport.use(new FacebookStrategy({
     clientSecret: process.env.FACEBOOK_APP_SECRET,
     callbackURL: "/auth/facebook/callback"
   },
-  function(accessToken, refreshToken, profile, cb) {
-    // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-    //   return cb(err, user);
-    // });
+  function(accessToken, refreshToken, profile, done) {
+    
     let url = "https://graph.facebook.com/v3.2/me?" +
-    "fields=id,name,email,first_name,last_name&access_token=" + accessToken;
+    "fields=id,email,first_name,last_name&access_token=" + accessToken;
 
     request({
         url: url,
         json: true
     }, function (err, response, body) {
-        let email = body.email;  // body.email contains your email
-        console.log(body); 
+        let payload = {
+            'username': body.email,
+            'first_name': body.first_name,
+            'last_name': body.last_name,
+            'oauth_id': body.id,
+            'type': 'facebook'
+        }
+
+        User.findOrCreate({'oauth_id': profile.id }, payload, function (err, user) {
+            return done(err, user._id);
+        });
     });
+
     //console.log(profile);
-    return cb(null, profile);
+    // return cb(null, profile);
   }
 ));
 

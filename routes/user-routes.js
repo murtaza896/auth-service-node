@@ -5,6 +5,7 @@ const   express       = require('express'),
 
 router.post('/sign-up', (req, res) => {
     let payload = req.body;
+    payload.type = 'local';
     //save the payload in mongoDB
     bcrypt.hash(payload.password, 10, (err, hash) => {
         payload.password = hash;
@@ -16,10 +17,6 @@ router.post('/sign-up', (req, res) => {
     });
 });
 
-router.post('/login', (req, res) => {
-
-});
-
 router.get('/check-existence', (req, res) => {
    let username = req.query.email;
    User.findOne({'username': username}, (err, user) => {
@@ -29,7 +26,7 @@ router.get('/check-existence', (req, res) => {
        else if(!user){
            res.send({'user_id': -1}).status(200);
        }
-       else res.send({'user_id': user._id}).status(200);
+       else res.send({'user_id': user._id, 'type': user.type}).status(200);
    });
 });
 
