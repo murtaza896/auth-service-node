@@ -1,7 +1,25 @@
+const request = require('request');
+const { cookie } = require('request');
+const passport = require('passport');
+// const myMiddleWare = require('../app');
+
 const   express       = require('express'),
         router        = express.Router(),
         bcrypt        = require('bcrypt'),
-        User          = require('../models/user-model');
+        User          = require('../models/user-model'),
+        cookieSession = require('cookie-session'),
+        cookieParser = require('cookie-parser');
+
+router.use(cookieParser());
+
+function myMiddleWare(req, res, next){
+    console.log("I am in middleware");
+    console.log(req.cookies);
+    if(req.isAuthenticated())
+        next();
+    else 
+        res.json({}).status(400);
+}
 
 router.post('/sign-up', (req, res) => {
     let payload = req.body;
@@ -28,6 +46,22 @@ router.get('/check-existence', (req, res) => {
        }
        else res.send({'user_id': user._id, 'type': user.type}).status(200);
    });
+});
+
+router.get('/get-user', myMiddleWare, (req, res) => {
+    let user_id = req.user;
+    console.log(req.cookies);
+    User.findById(user_id, (err, docs)=>{
+        if (err)
+        {
+            res.json({"message":err}).status(400);
+        }
+        else 
+        {
+            res.json({'first_name': docs['first_name'], 'last_name': docs['last_name']}).status(200);
+        }
+    });
+    
 });
 
 module.exports = router;

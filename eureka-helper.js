@@ -12,7 +12,7 @@ exports.registerWithEureka = function(appName, PORT) {
       ipAddr: ipAddr,
     //   statusPageUrl: 'http://__HOST__:8080/info',
     //   healthCheckUrl: 'http://__HOST__:8080/healthcheck',
-    //   homePageUrl: 'http://__HOST__:8080/',
+      homePageUrl: 'http://localhost:8080/',
       port: {
         '$': PORT,
         '@enabled': 'true',

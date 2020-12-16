@@ -2,22 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const cookieSession = require('cookie-session');
-
-router.use(passport.initialize());
-router.use(cookieSession({
-    maxAge: 24 * 60 * 60 * 1000,
-    keys: ['randomKey']
-}));
-router.use(passport.session());
-
-passport.serializeUser((user, done) => {
-    done(null, user);
-});
-
-passport.deserializeUser((user, done) => {
-    done(null, user);
-});
-
+const Keygrip = require('keygrip');
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 

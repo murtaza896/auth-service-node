@@ -5,14 +5,46 @@ app                     = express(),
 authRouter              = require('./routes/auth-routes'),
 userRouter              = require('./routes/user-routes'),
 passport                = require('passport'),
-mongoose                = require('mongoose');
+mongoose                = require('mongoose'),
 cookieSession           = require('cookie-session'),
-bodyParser              = require('body-parser');
-eurekaHelper            = require('./eureka-helper');
+bodyParser              = require('body-parser'),
+eurekaHelper            = require('./eureka-helper'),
+Keygrip                 = require('keygrip'),
+User                    = require('./models/user-model');
 
 mongoose.connect(`${process.env.MONGODB_URI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
+
+
+
+
+app.use(cookieSession({
+    maxAge: 24 * 60 * 60 * 1000,
+    // keys: ['randomKey'],
+    keys: new Keygrip(['key1', 'key2'], 'SHA384', 'base64'),
+    name: 'jwt'
+}));
+
 app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+  
+passport.deserializeUser((user, done) => {
+    
+    User.findById(user, (err, docs)=>{
+        if(err)
+            done(err)
+        else if(!docs)
+            done(null, null);
+        else 
+            done(null, user);
+    });
+       
+});
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
@@ -31,4 +63,6 @@ app.listen(process.env.PORT, function(){
     console.log('listening on port: ' + process.env.PORT);
 })
 
+
 eurekaHelper.registerWithEureka('auth-service', process.env.PORT);
+
