@@ -6,9 +6,8 @@ const Keygrip = require('keygrip');
 const cors = require('cors');
 
 
-
 // router.use(cors());
-router.use(cors({origin: ['localhost:4200/', 'localhost:8764/']}));
+router.use(cors({credentials: true, origin: 'http://localhost:4200, http://localhost:8764'}));
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
@@ -45,8 +44,28 @@ router.post('/local',
     
     // res.cookie("jwt", )
     // console.log(req.session);
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+
+    // Request methods you wish to allow
+//    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+  //  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    //res.setHeader('Access-Control-Allow-Credentials', true);
+    
+    res.setHeader('kuch-bhi','okkkk' );
     res.cookie("abc","def");
+  //   res.header('Access-Control-Allow-Credentials', true);
+  // //res.header('Access-Control-Allow-Origin', req.headers.origin);
+  // res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
+  // res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+
+  //   res.setHeader('Access-Control-Expose-Headers', 'kuch-bhi,Set-Cookie');
     res.json({"token": req.user}).status(200);
+    
     // res.redirect('http://localhost:4200/home');
     // res.json({"message": "logged in"}).status(200);
   }
