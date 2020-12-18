@@ -2,6 +2,7 @@ const request = require('request');
 const { cookie } = require('request');
 const passport = require('passport');
 // const myMiddleWare = require('../app');
+const cors = require('cors');
 
 const   express       = require('express'),
         router        = express.Router(),
@@ -11,6 +12,7 @@ const   express       = require('express'),
         cookieParser = require('cookie-parser');
 
 router.use(cookieParser());
+router.use(cors());
 
 function myMiddleWare(req, res, next){
     console.log("I am in middleware");
@@ -22,8 +24,10 @@ function myMiddleWare(req, res, next){
 }
 
 router.post('/sign-up', (req, res) => {
+    
     let payload = req.body;
     payload.type = 'local';
+    console.log(req.body);
     //save the payload in mongoDB
     bcrypt.hash(payload.password, 10, (err, hash) => {
         payload.password = hash;
@@ -58,6 +62,7 @@ router.get('/get-user', myMiddleWare, (req, res) => {
         }
         else 
         {
+            res.cookie("user_id", user_id);
             res.json({'first_name': docs['first_name'], 'last_name': docs['last_name']}).status(200);
         }
     });

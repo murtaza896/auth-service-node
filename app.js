@@ -11,18 +11,19 @@ bodyParser              = require('body-parser'),
 eurekaHelper            = require('./eureka-helper'),
 Keygrip                 = require('keygrip'),
 User                    = require('./models/user-model');
-
+cors                    = require('cors');
 mongoose.connect(`${process.env.MONGODB_URI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 
-
+app.use(cors());
 
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     // keys: ['randomKey'],
     keys: new Keygrip(['key1', 'key2'], 'SHA384', 'base64'),
-    name: 'jwt'
+    name: 'jwt',
+    httpOnly:false
 }));
 
 app.use(passport.initialize());
@@ -46,6 +47,7 @@ passport.deserializeUser((user, done) => {
 });
 
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
 
