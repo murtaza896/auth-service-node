@@ -20,7 +20,7 @@ function myMiddleWare(req, res, next){
     if(req.isAuthenticated())
         next();
     else 
-        res.json({}).status(400);
+        res.json({}).status(401);
 }
 
 router.post('/sign-up', (req, res) => {
